@@ -57,20 +57,29 @@ myApp.component('question',{
     template:`<div class="container">
                 <h3>{{item.data[item.num].question}}</h3>
                 <ul>
-                    <li ng-repeat="answer in item.data[item.num].options" ng-click="item.answer(answer)">{{answer}}</li>
+                    <li ng-repeat="answer in item.data[item.num].options" ng-click="item.answer(answer,$index)" ng-class="{activ: item.colorful == $index}">{{answer}}</li>
                 </ul>
-                <a href="#!/{{item.data[item.num].text}}" ui-sref-active="active">{{item.data[item.num].text}}</a>
+                <div class="buttomContainer"><a href="#!/{{item.data[item.num].text}}" ui-sref-active="active" ng-click="item.saveAnswer()">{{item.icon}}</a></div>
               </div>`,
 bindings:{num:"="},
     controller:function(QuestionsService,AnswersService){
+        this.colorful =null;
         QuestionsService().then(function(data){
-          this.data= data;
-        }.bind(this));                
-        this.answer = function(answer){
+            this.data= data;
+            if (this.data[this.num].text !== "finish"){
+                this.icon= "Next ➤";
+            }else{
+                this.icon= "Finish";
+            }
+        }.bind(this));      
+        this.answer = function(answer,$index){
+            this.ans = answer;
+            this.colorful = $index;
+        };
+        this.saveAnswer = function(){
             var good =this.data[this.num].answer;
-            AnswersService.check(good,answer);
-            AnswersService.setAnswer(answer);
-            console.log(AnswersService.get()); 
+            AnswersService.check(good,this.ans);
+            AnswersService.setAnswer(this.ans);
         };
     },
     controllerAs:'item'
@@ -78,9 +87,11 @@ bindings:{num:"="},
 });
 
 myApp.component('finish',{
-    template:`<h3>Quiz is over</h3>
-    <div>You answered {{sumerry.correct}}  correct answers and {{sumerry.wrong}} wrong answers</div>
-            <a class="again" ui-sref="default" ui-sref-active="active">Play again</a>`,
+    template:`<div class="container">
+                <h3>Quiz is over..</h3>
+                <div class="answerContainer">You answered {{sumerry.correct}}  correct answers out of {{sumerry.wrong + sumerry.correct}} questions</div>
+                <div class="buttomContainer"><a ui-sref="default" ui-sref-active="active">Click to play again</a></div>
+            </div>`,
     controller:function(AnswersService){
         this.correct = AnswersService.getCorrectAnswersNum();
         this.wrong = AnswersService.getWrongAnswersNum();
