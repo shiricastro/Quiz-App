@@ -90,7 +90,7 @@ myApp.component('finish',{
     template:`<div class="container">
                 <h3>Quiz is over..</h3>
                 <div class="answerContainer">You answered {{sumerry.correct}}  correct answers out of {{sumerry.wrong + sumerry.correct}} questions</div>
-                <div class="buttomContainer"><a ui-sref="default" ui-sref-active="active">Click to play again</a></div>
+                <div class="buttomContainer again"><a ui-sref="default" ui-sref-active="active">Click to play again</a></div>
             </div>`,
     controller:function(AnswersService){
         this.correct = AnswersService.getCorrectAnswersNum();
